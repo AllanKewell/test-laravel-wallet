@@ -23,6 +23,14 @@ test('dashboard page is displayed', function () {
         ]);
 });
 
+test("dashboard page but user haven't wallet", function () {
+    $user = User::factory()->create();
+
+    $response = actingAs($user)->get('/');
+
+    $response->assertServerError();
+});
+
 test('send money to a friend', function () {
     $user = User::factory()->has(Wallet::factory()->richChillGuy())->create();
     $recipient = User::factory()->has(Wallet::factory())->create();

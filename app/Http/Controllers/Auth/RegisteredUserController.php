@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
+use App\Models\Wallet;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -28,11 +29,17 @@ class RegisteredUserController
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $user = User::create([
+        // BUGFIX : Create default wallet for new User
+        $wallet = new Wallet();
+
+        $user = new User([
             'name' => $request->name,
             'email' => strtolower($request->email),
-            'password' => Hash::make($request->password),
+            'password' => Hash::make($request->password)
         ]);
+
+        $user->save();
+        $user->wallet()->save($wallet);
 
         event(new Registered($user));
 
